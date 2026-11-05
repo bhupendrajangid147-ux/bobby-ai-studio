@@ -1,151 +1,101 @@
-import streamlit as st
-import pandas as pd
-import math
-from pathlib import Path
 
-# Set the title and favicon that appear in the Browser's tab bar.
+import streamlit as st
+
 st.set_page_config(
-    page_title='GDP dashboard',
-    page_icon=':earth_americas:', # This is an emoji shortcode. Could be a URL too.
+    page_title="BOBI AI STUDIO",
+    page_icon="✨",
+    layout="wide"
 )
 
-# -----------------------------------------------------------------------------
-# Declare some useful functions.
+st.markdown("""
+<style>
+.stApp {
+    background: linear-gradient(135deg,#101426,#202744);
+    color: white;
+}
+section[data-testid="stSidebar"] {
+    background: #111827;
+}
+.hero {
+    padding: 30px;
+    border-radius: 18px;
+    background: linear-gradient(120deg,#312e81,#7c3aed);
+}
+</style>
+""", unsafe_allow_html=True)
 
-@st.cache_data
-def get_gdp_data():
-    """Grab GDP data from a CSV file.
-
-    This uses caching to avoid having to read the file every time. If we were
-    reading from an HTTP endpoint instead of a file, it's a good idea to set
-    a maximum age to the cache with the TTL argument: @st.cache_data(ttl='1d')
-    """
-
-    # Instead of a CSV on disk, you could read from an HTTP endpoint here too.
-    DATA_FILENAME = Path(__file__).parent/'data/gdp_data.csv'
-    raw_gdp_df = pd.read_csv(DATA_FILENAME)
-
-    MIN_YEAR = 1960
-    MAX_YEAR = 2022
-
-    # The data above has columns like:
-    # - Country Name
-    # - Country Code
-    # - [Stuff I don't care about]
-    # - GDP for 1960
-    # - GDP for 1961
-    # - GDP for 1962
-    # - ...
-    # - GDP for 2022
-    #
-    # ...but I want this instead:
-    # - Country Name
-    # - Country Code
-    # - Year
-    # - GDP
-    #
-    # So let's pivot all those year-columns into two: Year and GDP
-    gdp_df = raw_gdp_df.melt(
-        ['Country Code'],
-        [str(x) for x in range(MIN_YEAR, MAX_YEAR + 1)],
-        'Year',
-        'GDP',
+with st.sidebar:
+    st.title("✨ BOBI AI STUDIO")
+    st.caption("YOUR CREATIVE AI PLATFORM")
+    page = st.radio(
+        "MENU",
+        ["Home", "AI Chat", "AI Image Generator",
+         "AI Video Tools", "Photo Editing",
+         "AI Prompt Maker", "About"]
     )
 
-    # Convert years from string to integers
-    gdp_df['Year'] = pd.to_numeric(gdp_df['Year'])
+if page == "Home":
+    st.markdown("""
+    <div class="hero">
+    <h1>✨ Welcome to BOBI AI STUDIO</h1>
+    <p>Your All-in-One AI Creative Platform</p>
+    <p>Chat • Create • Edit • Imagine</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    return gdp_df
+    st.subheader("🚀 Explore AI Tools")
+    col1, col2 = st.columns(2)
 
-gdp_df = get_gdp_data()
+    with col1:
+        st.info("🤖 AI Chat Assistant")
+        st.info("🎨 AI Image Generator")
+        st.info("📸 Photo Editing")
 
-# -----------------------------------------------------------------------------
-# Draw the actual page
+    with col2:
+        st.info("🎬 AI Video Tools")
+        st.info("✍️ AI Prompt Maker")
+        st.info("💡 Creative Workspace")
 
-# Set the title that appears at the top of the page.
-'''
-# :earth_americas: GDP dashboard
+elif page == "AI Chat":
+    st.title("🤖 BOBI AI CHAT")
+    st.write("Welcome to your AI Assistant!")
+    st.warning("AI API connection is required for real AI replies.")
 
-Browse GDP data from the [World Bank Open Data](https://data.worldbank.org/) website. As you'll
-notice, the data only goes to 2022 right now, and datapoints for certain years are often missing.
-But it's otherwise a great (and did I mention _free_?) source of data.
-'''
+elif page == "AI Image Generator":
+    st.title("🎨 AI IMAGE GENERATOR")
+    prompt = st.text_area("Describe your image")
+    if st.button("Generate Image"):
+        st.info("Image generation API will be connected next.")
 
-# Add some spacing
-''
-''
+elif page == "AI Video Tools":
+    st.title("🎬 AI VIDEO STUDIO")
+    idea = st.text_area("Describe your video idea")
+    if st.button("Create Video"):
+        st.info("Video generation API will be connected next.")
 
-min_value = gdp_df['Year'].min()
-max_value = gdp_df['Year'].max()
+elif page == "Photo Editing":
+    st.title("📸 PHOTO EDITING")
+    photo = st.file_uploader(
+        "Upload your photo",
+        type=["jpg", "jpeg", "png"]
+    )
+    if photo:
+        st.image(photo, use_container_width=True)
 
-from_year, to_year = st.slider(
-    'Which years are you interested in?',
-    min_value=min_value,
-    max_value=max_value,
-    value=[min_value, max_value])
-
-countries = gdp_df['Country Code'].unique()
-
-if not len(countries):
-    st.warning("Select at least one country")
-
-selected_countries = st.multiselect(
-    'Which countries would you like to view?',
-    countries,
-    ['DEU', 'FRA', 'GBR', 'BRA', 'MEX', 'JPN'])
-
-''
-''
-''
-
-# Filter the data
-filtered_gdp_df = gdp_df[
-    (gdp_df['Country Code'].isin(selected_countries))
-    & (gdp_df['Year'] <= to_year)
-    & (from_year <= gdp_df['Year'])
-]
-
-st.header('GDP over time', divider='gray')
-
-''
-
-st.line_chart(
-    filtered_gdp_df,
-    x='Year',
-    y='GDP',
-    color='Country Code',
-)
-
-''
-''
-
-
-first_year = gdp_df[gdp_df['Year'] == from_year]
-last_year = gdp_df[gdp_df['Year'] == to_year]
-
-st.header(f'GDP in {to_year}', divider='gray')
-
-''
-
-cols = st.columns(4)
-
-for i, country in enumerate(selected_countries):
-    col = cols[i % len(cols)]
-
-    with col:
-        first_gdp = first_year[first_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
-        last_gdp = last_year[last_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
-
-        if math.isnan(first_gdp):
-            growth = 'n/a'
-            delta_color = 'off'
+elif page == "AI Prompt Maker":
+    st.title("✍️ BOBI AI PROMPT MAKER")
+    subject = st.text_input("What do you want to create?")
+    style = st.selectbox(
+        "Choose Style",
+        ["Cinematic", "Royal", "Realistic", "3D", "Professional"]
+    )
+    if st.button("Create Prompt"):
+        if subject:
+            st.code(f"{subject}, {style} style, 4K, high detail")
         else:
-            growth = f'{last_gdp / first_gdp:,.2f}x'
-            delta_color = 'normal'
+            st.warning("Enter a subject first.")
 
-        st.metric(
-            label=f'{country} GDP',
-            value=f'{last_gdp:,.0f}B',
-            delta=growth,
-            delta_color=delta_color
-        )
+elif page == "About":
+    st.title("✨ ABOUT BOBI AI STUDIO")
+    st.write("Created by Bhupendra Jangid (Bobi)")
+    st.write("Your All-in-One Creative AI Platform")
