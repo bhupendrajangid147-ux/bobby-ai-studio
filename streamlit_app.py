@@ -13,89 +13,73 @@ st.markdown("""
     background: linear-gradient(135deg,#101426,#202744);
     color: white;
 }
-section[data-testid="stSidebar"] {
-    background: #111827;
+h1,h2,h3,p,label {
+    color: white !important;
 }
-.hero {
-    padding: 30px;
-    border-radius: 18px;
-    background: linear-gradient(120deg,#312e81,#7c3aed);
+div.stButton > button {
+    background: linear-gradient(90deg,#673de6,#8b5cf6);
+    color: white;
+    border-radius: 12px;
+    border: none;
+    padding: 12px;
+    width: 100%;
 }
 </style>
 """, unsafe_allow_html=True)
 
-with st.sidebar:
-    st.title("✨ BOBI AI STUDIO")
-    st.caption("YOUR CREATIVE AI PLATFORM")
-    page = st.radio(
-        "MENU",
-        ["Home", "AI Chat", "AI Image Generator",
-         "AI Video Tools", "Photo Editing",
-         "AI Prompt Maker", "About"]
-    )
+st.title("✨ Welcome to BOBI AI STUDIO")
+st.subheader("Your All-in-One AI Creative Platform")
+st.write("Chat • Create • Edit • Imagine")
 
-if page == "Home":
-    st.markdown("""
-    <div class="hero">
-    <h1>✨ Welcome to BOBI AI STUDIO</h1>
-    <p>Your All-in-One AI Creative Platform</p>
-    <p>Chat • Create • Edit • Imagine</p>
-    </div>
-    """, unsafe_allow_html=True)
+st.divider()
 
-    st.subheader("🚀 Explore AI Tools")
-    col1, col2 = st.columns(2)
+menu = st.sidebar.radio(
+    "MENU",
+    [
+        "Home",
+        "AI Chat",
+        "AI Image Generator",
+        "Photo Editing",
+        "AI Video Tools",
+        "About"
+    ]
+)
 
-    with col1:
-        st.info("🤖 AI Chat Assistant")
-        st.info("🎨 AI Image Generator")
-        st.info("📸 Photo Editing")
+if menu == "Home":
+    st.header("🚀 Explore AI Tools")
+    st.info("🤖 AI Chat Assistant")
+    st.info("🎨 AI Image Generator")
+    st.info("📸 Photo Editing")
+    st.info("🎬 AI Video Tools")
 
-    with col2:
-        st.info("🎬 AI Video Tools")
-        st.info("✍️ AI Prompt Maker")
-        st.info("💡 Creative Workspace")
+elif menu == "AI Chat":
+    st.header("🤖 AI Chat Assistant")
+    st.success("AI Chat Interface Ready")
+    st.warning("AI API connection required.")
 
-elif page == "AI Chat":
-    st.title("🤖 BOBI AI CHAT")
-    st.write("Welcome to your AI Assistant!")
-    st.warning("AI API connection is required for real AI replies.")
-
-elif page == "AI Image Generator":
-    st.title("🎨 AI IMAGE GENERATOR")
+elif menu == "AI Image Generator":
+    st.header("🎨 AI Image Generator")
     prompt = st.text_area("Describe your image")
     if st.button("Generate Image"):
-        st.info("Image generation API will be connected next.")
+        st.info("Image API connection required.")
 
-elif page == "AI Video Tools":
-    st.title("🎬 AI VIDEO STUDIO")
-    idea = st.text_area("Describe your video idea")
-    if st.button("Create Video"):
-        st.info("Video generation API will be connected next.")
-
-elif page == "Photo Editing":
-    st.title("📸 PHOTO EDITING")
+elif menu == "Photo Editing":
+    st.header("📸 Photo Editing")
     photo = st.file_uploader(
         "Upload your photo",
         type=["jpg", "jpeg", "png"]
     )
     if photo:
-        st.image(photo, use_container_width=True)
+        st.image(photo, caption="Your Photo")
 
-elif page == "AI Prompt Maker":
-    st.title("✍️ BOBI AI PROMPT MAKER")
-    subject = st.text_input("What do you want to create?")
-    style = st.selectbox(
-        "Choose Style",
-        ["Cinematic", "Royal", "Realistic", "3D", "Professional"]
-    )
-    if st.button("Create Prompt"):
-        if subject:
-            st.code(f"{subject}, {style} style, 4K, high detail")
-        else:
-            st.warning("Enter a subject first.")
+elif menu == "AI Video Tools":
+    st.header("🎬 AI Video Tools")
+    idea = st.text_area("Describe your video idea")
+    if st.button("Create Video"):
+        st.info("Video API connection required.")
 
-elif page == "About":
-    st.title("✨ ABOUT BOBI AI STUDIO")
-    st.write("Created by Bhupendra Jangid (Bobi)")
-    st.write("Your All-in-One Creative AI Platform")
+elif menu == "About":
+    st.header("About BOBI AI STUDIO")
+    st.write("Your All-in-One AI Creative Platform")
+    st.write("Created with ❤️")
+    
